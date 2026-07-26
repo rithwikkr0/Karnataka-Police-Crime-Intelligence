@@ -1,0 +1,48 @@
+{
+  "defaults": {
+    "project": 1,
+    "env": 1
+  },
+  "actives": {
+    "project": 2,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "48113000000013024",
+      "name": "Project-Rainfall",
+      "domain": {
+        "id": "50044351379",
+        "name": "project-rainfall-60080124738.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60080124738",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    },
+    {
+      "idx": 2,
+      "id": "48113000000013049",
+      "name": "ksp-crime-intelligence",
+      "domain": {
+        "id": "50044351606",
+        "name": "ksp-crime-intelligence-60080124738.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60080124738",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}

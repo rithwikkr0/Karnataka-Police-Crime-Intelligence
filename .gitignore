@@ -1,0 +1,19 @@
+# Environment & Configuration Secrets
+app-config.json
+.env
+
+# Database & Uploads
+*.db
+uploads/
+
+# Python Cache & Build Artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Temporary logs & test artifacts
+*.log
+live_results*.json
+scratch/
+template.pptx
+prototype_deck_filled.pptx

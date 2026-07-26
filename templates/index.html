@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KSP Crime Intelligence System | Datathon 2026</title>
+  <meta name="description" content="Karnataka State Police — Intelligent Conversational AI for Crime Database Management. Multilingual querying, FIR ingestion, case linking, and investigative AI suggestions." />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════ LOGIN OVERLAY ════════════════════════════════ -->
+<div id="login-overlay">
+  <div class="login-card">
+    <span class="ksp-emblem">🛡️</span>
+    <h1>Karnataka State Police</h1>
+    <p>Crime Intelligence System &mdash; Datathon 2026</p>
+
+    <form id="login-form" autocomplete="off">
+      <input id="badge-input" type="text" placeholder="Badge Number (e.g. KSP001)" autocomplete="off" />
+      <input id="password-input" type="password" placeholder="Password" autocomplete="current-password" />
+      <button type="submit" class="btn-primary" id="login-btn">
+        <span id="login-btn-text">Login to System</span>
+      </button>
+    </form>
+
+    <div id="login-error"></div>
+
+    <div class="demo-hint">
+      Demo accounts — all use password: demo123<br/>
+      KSP001 &bull; KSP002 &bull; KSP003
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN APP ═════════════════════════════════════ -->
+<div id="app" class="hidden">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="emblem">🛡️</span>
+        <div class="brand">
+          <span>Karnataka Police</span>
+          <span>Crime Intelligence</span>
+        </div>
+      </div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item active" data-tab="chat" id="nav-chat">
+        <span class="nav-icon">💬</span> Chat Query
+      </li>
+      <li class="nav-item" data-tab="upload" id="nav-upload">
+        <span class="nav-icon">📄</span> FIR Upload
+      </li>
+      <li class="nav-item" data-tab="cases" id="nav-cases">
+        <span class="nav-icon">🗂️</span> Cases
+      </li>
+      <li class="nav-item" data-tab="profile" id="nav-profile">
+        <span class="nav-icon">👤</span> My Profile
+      </li>
+      <li class="nav-item" data-tab="dashboard" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </li>
+    </ul>
+
+    <div class="officer-panel">
+      <div class="officer-mini">
+        <div class="officer-avatar">👮</div>
+        <div class="officer-mini-info">
+          <div class="officer-mini-name" id="sidebar-name">Loading…</div>
+          <div class="officer-mini-badge" id="sidebar-badge">—</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logout-btn">⬅ Logout</button>
+    </div>
+  </nav>
+
+  <!-- ── Main content ─────────────────────────────────────────────────── -->
+  <div class="main-content">
+
+    <!-- ─── CHAT TAB ────────────────────────────────────────────────── -->
+    <div id="tab-chat" class="tab-panel active">
+      <div class="panel-header">
+        <div class="panel-title">💬 Chat <span>Query</span></div>
+        <small style="color:var(--text-muted);font-size:0.74rem">Ask in English, ಕನ್ನಡ, or తెలుగు</small>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-welcome" id="chat-welcome">
+          <span class="welcome-icon">🤖</span>
+          <h3>Ask anything about the crime database</h3>
+          <p>Type your question in any language — English, Kannada, or Telugu. The AI converts it to SQL and answers in your language.</p>
+          <div class="sample-queries">
+            <span class="sample-q" data-q="How many open cases are there?">How many open cases?</span>
+            <span class="sample-q" data-q="List all burglary cases in Bengaluru">Burglaries in Bengaluru</span>
+            <span class="sample-q" data-q="Which officer has the most solved cases?">Top officer by solved cases</span>
+            <span class="sample-q" data-q="Show all wanted criminals">All wanted criminals</span>
+            <span class="sample-q" data-q="ಕೋಲಾರ ಜಿಲ್ಲೆಯಲ್ಲಿ ಯಾವ ಪ್ರಕರಣಗಳಿವೆ?">ಕೋಲಾರ ಪ್ರಕರಣಗಳು</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-bar">
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Ask in English, ಕನ್ನಡ, or తెలుగు…" autocomplete="off" />
+          <button class="btn-send" id="chat-send" title="Send">➤</button>
+        </div>
+        <div class="chat-hint">Powered by Gemini AI &bull; NL→SQL→Answer pipeline &bull; Read-only database access</div>
+      </div>
+    </div>
+
+    <!-- ─── FIR UPLOAD TAB ───────────────────────────────────────────── -->
+    <div id="tab-upload" class="tab-panel">
+      <div class="panel-header">
+        <div class="panel-title">📄 FIR <span>Upload & Extraction</span></div>
+      </div>
+      <div class="panel-body">
+
+        <div class="upload-grid">
+          <!-- Drag-drop zone -->
+          <div class="drop-zone" id="drop-zone">
+            <span class="dz-icon">📁</span>
+            <h3>Upload FIR Document</h3>
+            <p>Drag & drop an image or PDF here, or click to choose a file</p>
+            <p style="font-size:0.7rem;color:var(--text-muted)">PNG, JPG, PDF, TIFF • Max 16 MB</p>
+            <input type="file" id="fir-file-input" accept=".png,.jpg,.jpeg,.pdf,.tiff,.bmp" />
+            <button class="btn-secondary" id="choose-file-btn" type="button">Choose File</button>
+            <div id="file-name-display" style="font-size:0.78rem;color:var(--blue-bright);margin-top:4px;"></div>
+          </div>
+
+          <!-- Text paste zone (PRIMARY path) -->
+          <div class="paste-zone">
+            <label>📋 Paste FIR Text (Recommended — works offline)</label>
+            <textarea id="fir-text-input" placeholder="Paste FIR text here in English, ಕನ್ನಡ, or తెలుగు…&#10;&#10;Example:&#10;FIR No: KSP/BLR/2025/101&#10;Date: 15-01-2025&#10;Suspect: ರಾಜು ಕುಮಾರ್&#10;Crime: Theft of mobile phones near Shivajinagar market..."></textarea>
+            <div style="display:flex;gap:8px">
+              <button class="btn-primary" id="extract-text-btn" type="button" style="flex:1">
+                🧠 Extract Profile with AI
+              </button>
+              <button class="btn-secondary" id="extract-file-btn" type="button" title="Extract from uploaded file">
+                📷 OCR File
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile review (shown after extraction) -->
+        <div id="profile-review" class="hidden">
+          <div class="card">
+            <div class="card-title">✅ Review Extracted Profile — Edit Before Saving</div>
+            <div style="margin-bottom:12px">
+              <span class="badge badge-ai">🤖 AI Extracted</span>
+              <span style="font-size:0.78rem;color:var(--text-muted);margin-left:8px">Review carefully before confirming. This profile will be saved with confidence_flag = "ai_extracted".</span>
+            </div>
+
+            <div class="section-title">👤 Criminal Profile</div>
+            <div class="review-grid">
+              <div class="field-group">
+                <label>Name (preserve original script)</label>
+                <input id="rev-name" type="text" />
+              </div>
+              <div class="field-group">
+                <label>Aliases</label>
+                <input id="rev-aliases" type="text" />
+              </div>
+              <div class="field-group">
+                <label>Crime Type</label>
+                <select id="rev-crime-type">
+                  <option value="theft">Theft</option>
+                  <option value="burglary">Burglary</option>
+                  <option value="murder">Murder</option>
+                  <option value="fraud">Fraud</option>
+                  <option value="assault">Assault</option>
+                  <option value="kidnapping">Kidnapping</option>
+                  <option value="vehicle_theft">Vehicle Theft</option>
+                  <option value="drug_trafficking">Drug Trafficking</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Status</label>
+                <select id="rev-status">
+                  <option value="wanted">Wanted</option>
+                  <option value="active">Active</option>
+                  <option value="arrested">Arrested</option>
+                </select>
+              </div>
+              <div class="field-group" style="grid-column:1/-1">
+                <label>Description</label>
+                <textarea id="rev-description" rows="2"></textarea>
+              </div>
+              <div class="field-group" style="grid-column:1/-1">
+                <label>Last Known Location</label>
+                <input id="rev-location" type="text" />
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="section-title">📁 Case Details</div>
+            <div class="review-grid">
+              <div class="field-group">
+                <label>Case / FIR Number</label>
+                <input id="rev-case-number" type="text" />
+              </div>
+              <div class="field-group">
+                <label>Date (YYYY-MM-DD)</label>
+                <input id="rev-case-date" type="date" />
+              </div>
+              <div class="field-group" style="grid-column:1/-1">
+                <label>Crime Location</label>
+                <input id="rev-case-location" type="text" />
+              </div>
+              <div class="field-group" style="grid-column:1/-1">
+                <label>Incident Description</label>
+                <textarea id="rev-case-description" rows="3"></textarea>
+              </div>
+            </div>
+
+            <div id="extraction-notes" class="hidden" style="margin-bottom:12px;padding:10px 14px;background:var(--orange-dim);border:1px solid rgba(255,171,64,0.2);border-radius:8px;font-size:0.78rem;color:var(--orange)"></div>
+
+            <div class="review-actions">
+              <button class="btn-confirm" id="confirm-save-btn">✓ Confirm &amp; Save Profile</button>
+              <button class="btn-discard" id="discard-btn">✕ Discard</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── CASES TAB ────────────────────────────────────────────────── -->
+    <div id="tab-cases" class="tab-panel">
+      <div class="panel-header">
+        <div class="panel-title">🗂️ <span>Cases</span></div>
+      </div>
+      <div class="panel-body">
+
+        <div class="cases-toolbar">
+          <select class="filter-select" id="filter-status">
+            <option value="">All Status</option>
+            <option value="open">Open</option>
+            <option value="solved">Solved</option>
+          </select>
+          <select class="filter-select" id="filter-crime">
+            <option value="">All Crime Types</option>
+            <option value="burglary">Burglary</option>
+            <option value="theft">Theft</option>
+            <option value="murder">Murder</option>
+            <option value="fraud">Fraud</option>
+            <option value="assault">Assault</option>
+            <option value="kidnapping">Kidnapping</option>
+            <option value="vehicle_theft">Vehicle Theft</option>
+            <option value="drug_trafficking">Drug Trafficking</option>
+          </select>
+          <button class="btn-secondary" id="refresh-cases-btn">↺ Refresh</button>
+        </div>
+
+        <div class="case-grid" id="cases-list">
+          <div class="loading-placeholder"><span class="spinner"></span> Loading cases…</div>
+        </div>
+
+        <!-- Case detail panel -->
+        <div id="case-detail">
+          <div class="divider"></div>
+
+          <div class="card">
+            <div class="card-title">📋 Case Detail</div>
+            <div id="case-detail-content"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🔗 Similar Cases</div>
+            <div id="similar-cases-content">
+              <div class="loading-placeholder"><span class="spinner"></span> Analyzing…</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">💡 AI Investigative Suggestions</div>
+            <div id="next-steps-content">
+              <div class="loading-placeholder"><span class="spinner"></span> Generating suggestions…</div>
+            </div>
+          </div>
+
+          <div class="card" id="solvers-card">
+            <div class="card-title">🤝 Officers Who Solved Similar Cases</div>
+            <div id="solvers-content">
+              <div class="loading-placeholder"><span class="spinner"></span> Finding experts…</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── PROFILE TAB ──────────────────────────────────────────────── -->
+    <div id="tab-profile" class="tab-panel">
+      <div class="panel-header">
+        <div class="panel-title">👤 My <span>Profile</span></div>
+      </div>
+      <div class="panel-body" id="profile-body">
+        <div class="loading-placeholder"><span class="spinner"></span> Loading profile…</div>
+      </div>
+    </div>
+
+    <!-- ─── DASHBOARD TAB ────────────────────────────────────────────── -->
+    <div id="tab-dashboard" class="tab-panel">
+      <div class="panel-header">
+        <div class="panel-title">📊 <span>Analytics Dashboard</span></div>
+      </div>
+      <div class="panel-body">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Crime Type Distribution</h3>
+            <canvas id="chart-crime-dist"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Open vs Solved Cases</h3>
+            <canvas id="chart-status"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Cases by Station</h3>
+            <canvas id="chart-station"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Monthly Case Volume</h3>
+            <canvas id="chart-monthly"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

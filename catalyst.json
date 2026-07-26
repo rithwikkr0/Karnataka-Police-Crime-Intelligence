@@ -1,0 +1,10 @@
+{
+  "project_id": "48113000000013049",
+  "project_name": "ksp-crime-intelligence",
+  "appsail": [
+    {
+      "name": "ksp-crime-api",
+      "source": "."
+    }
+  ]
+}

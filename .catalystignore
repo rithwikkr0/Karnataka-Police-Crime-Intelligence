@@ -1,0 +1,12 @@
+# Exclude local dev artifacts from Catalyst deploy bundle
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.db
+uploads/
+.gemini/
+live_results*.json
+scratch/
+node_modules/
+*.log
