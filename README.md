@@ -78,7 +78,8 @@ This system solves all four using a Gemini-powered AI backend with a single-page
 
 ```bash
 # 1. Clone / navigate to project folder
-cd "Kar Datathon"
+git clone https://github.com/rithwikkr0/Karnataka-Police-Crime-Intelligence.git
+cd Karnataka-Police-Crime-Intelligence
 
 # 2. Create virtual environment
 python -m venv venv

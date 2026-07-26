@@ -429,7 +429,7 @@ def update_presentation():
             
             links = [
                 "• GitHub Public Repository:",
-                "  https://github.com/rithwik-ksp/ksp-crime-intelligence",
+                "  https://github.com/rithwikkr0/Karnataka-Police-Crime-Intelligence",
                 "",
                 "• Demo Video Link (3 Minutes):",
                 "  https://youtu.be/ksp-crime-demo-2026",
