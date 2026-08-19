@@ -2,17 +2,25 @@
 ### Intelligent Conversational AI for Karnataka State Police Crime Database
 #### Datathon 2026
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-4da6ff?style=for-the-badge&logo=github)](https://rithwikkr0.github.io/Karnataka-Police-Crime-Intelligence/)
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Backend-Flask%203.0-lightgrey.svg)](https://flask.palletsprojects.com/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite%20%2F%20sql.js-003B57.svg)](https://sqlite.org/)
+[![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-orange.svg)](https://aistudio.google.com/)
+
+**Live Web App**: [https://rithwikkr0.github.io/Karnataka-Police-Crime-Intelligence/](https://rithwikkr0.github.io/Karnataka-Police-Crime-Intelligence/)
+
 ---
 
-## Problem Statement
+## Overview & Architecture
 
-Karnataka State Police manages thousands of FIRs, criminal profiles, and case records spread across stations and districts. Officers lack a fast, intuitive way to:
-1. Query this data in their own language (Kannada, Telugu, English)
-2. Automatically ingest FIR documents into structured profiles
-3. Connect new crimes with similar historical patterns
-4. Get evidence-based investigative suggestions instantly
-
-This system solves all four using a Gemini-powered AI backend with a single-page web interface.
+The system supports **dual-mode deployment**:
+1. **GitHub Pages Standalone Mode (Zero Server / Instant Demo)**:
+   - Runs 100% in the browser using WebAssembly SQLite (`sql.js`), preloaded with the official KSP database schema and sample data.
+   - Client-side Google Gemini API execution for natural language SQL chat and structured FIR ingestion.
+   - In-browser Tesseract.js OCR for image FIR uploads.
+2. **Full Flask Server Mode**:
+   - Python Flask WSGI server with SQLite and Gemini backend API, deployable to Zoho Catalyst AppSail, Render, Railway, or local machines.
 
 ---
 
@@ -22,7 +30,7 @@ This system solves all four using a Gemini-powered AI backend with a single-page
 |---------|---------|
 | **Multilingual Chat Query** | Natural language → SQL → answer in the same language (English / Kannada / Telugu) |
 | **FIR Auto-Ingestion** | Paste FIR text or upload an image; Gemini extracts structured criminal + case profile |
-| **OCR Support** | Tesseract OCR with `eng+kan+tel` language packs (graceful fallback if not installed) |
+| **OCR Support** | In-browser & server-side Tesseract OCR support with multi-language fallback |
 | **Similar Case Linking** | Transparent weighted scoring: crime type, location, date, MO keywords |
 | **AI Investigative Suggestions** | Gemini synthesises patterns from solved similar cases |
 | **Officer Collaboration** | View officers who solved similar crimes; send help requests |
@@ -33,16 +41,18 @@ This system solves all four using a Gemini-powered AI backend with a single-page
 ## Project Structure
 
 ```
+/index.html         — Root single-page application (GitHub Pages entry point)
 /app.py             — Flask backend (all routes, DB, AI logic)
 /templates/
-  index.html        — Single-page frontend
+  index.html        — Flask template entry point
 /static/
   style.css         — Dark glassmorphism UI (KSP blue + gold)
-  script.js         — Frontend JS (no build step)
+  script.js         — Dual-mode frontend JS (sql.js + Gemini + API client)
+/.github/workflows/
+  deploy-pages.yml  — Automated GitHub Pages deployment workflow
 /requirements.txt   — Pinned Python dependencies
 /sample_data.sql    — Reference SQL for seed data
 /README.md          — This file
-/crime.db           — Auto-created SQLite database on first run
 ```
 
 ---
